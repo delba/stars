@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"path"
@@ -72,7 +71,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 func Login(w http.ResponseWriter, r *http.Request) {
 	url := config.AuthCodeURL(randomString())
 
-	http.Redirect(w, r, url, 301)
+	http.Redirect(w, r, url, 302)
 }
 
 func Callback(w http.ResponseWriter, r *http.Request) {
@@ -84,7 +83,7 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 	currentUser, err = GetCurrentUser()
 	handle(err)
 
-	http.Redirect(w, r, "/", 301)
+	http.Redirect(w, r, "/", 302)
 }
 
 func GetClient(r *http.Request) (*octokit.Client, error) {
@@ -119,7 +118,8 @@ func GetCurrentUser() (*octokit.User, error) {
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("logout")
+	client, currentUser = nil, nil
+	http.Redirect(w, r, "/", 302)
 }
 
 func GetFollowing() ([]octokit.User, error) {
