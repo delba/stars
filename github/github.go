@@ -5,6 +5,7 @@ import "github.com/octokit/go-octokit/octokit"
 var client = octokit.NewClient(nil)
 
 func GetFollowingStarred(username string) ([]octokit.Repository, error) {
+	c := make(chan []octokit.Repository)
 	var repositories []octokit.Repository
 
 	user, err := GetUser(username)
@@ -18,12 +19,17 @@ func GetFollowingStarred(username string) ([]octokit.Repository, error) {
 	}
 
 	for _, user := range following {
-		starred, err := GetStarred(user)
-		if err != nil {
-			return repositories, err
-		}
+		go func(u octokit.User, c chan []octokit.Repository) {
+			starred, err := GetStarred(user)
+			if err != nil {
+				panic(err)
+			}
+			c <- starred
+		}(user, c)
+	}
 
-		repositories = append(repositories, starred...)
+	for range following {
+		repositories = append(repositories, <-c...)
 	}
 
 	return repositories, err
