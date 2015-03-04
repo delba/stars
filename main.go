@@ -1,9 +1,11 @@
+// TODO Refactor!!!
 package main
 
 import (
 	"net/http"
 	"os"
 	"path"
+	"sort"
 	"text/template"
 
 	"github.com/octokit/go-octokit/octokit"
@@ -53,18 +55,71 @@ func main() {
 }
 
 func Index(w http.ResponseWriter, r *http.Request) {
-	var file string
-
 	if currentUser == nil {
-		file = "public.html"
+		PublicIndex(w, r)
 	} else {
-		file = "private.html"
+		PrivateIndex(w, r)
 	}
+}
 
-	t, err := template.ParseFiles(path.Join("views", file))
+func PublicIndex(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles(path.Join("views", "public.html"))
 	handle(err)
 
 	err = t.Execute(w, nil)
+	handle(err)
+}
+
+type ByPopularity []string
+
+func (r ByPopularity) Len() int {
+	return len(r)
+}
+
+func (r ByPopularity) Swap(i, j int) {
+	r[i], r[j] = r[j], r[i]
+}
+
+func (r ByPopularity) Less(i, j int) bool {
+	return len(followingStarred[r[i]]) > len(followingStarred[r[j]])
+}
+
+var followingStarred map[string][]string
+var keys []string
+
+type Data struct {
+	Keys   []string
+	Result map[string][]string
+}
+
+type Result struct {
+	Repo  string
+	Users []string
+}
+
+func (d *Data) Get(key string) []string {
+	return d.Result[key]
+}
+
+func PrivateIndex(w http.ResponseWriter, r *http.Request) {
+	var err error
+
+	followingStarred, err = GetFollowingStarred()
+	for key, _ := range followingStarred {
+		keys = append(keys, key)
+	}
+	sort.Sort(ByPopularity(keys))
+
+	var results []Result
+
+	for _, key := range keys {
+		results = append(results, Result{Repo: key, Users: followingStarred[key]})
+	}
+
+	t, err := template.ParseFiles(path.Join("views", "private.html"))
+	handle(err)
+
+	err = t.Execute(w, results)
 	handle(err)
 }
 
@@ -150,6 +205,55 @@ func GetFollowing() ([]octokit.User, error) {
 	}
 
 	return following, err
+}
+
+func GetFollowingStarred() (map[string][]string, error) {
+	var err error
+
+	c := make(chan map[octokit.User][]octokit.Repository)
+	result := make(map[string][]string)
+	// var result map[octokit.Repository][]octokit.User
+
+	following, err := GetFollowing()
+	if err != nil {
+		return result, err
+	}
+
+	for _, user := range following {
+		go func(u octokit.User, c chan map[octokit.User][]octokit.Repository) {
+			starred, err := GetStarred(u)
+			if err != nil {
+				panic(err)
+			}
+			c <- map[octokit.User][]octokit.Repository{
+				u: starred,
+			}
+		}(user, c)
+	}
+
+	for range following {
+		for user, repos := range <-c {
+			for _, repo := range repos {
+				result[repo.FullName] = append(result[repo.FullName], user.Login)
+			}
+		}
+	}
+
+	return result, err
+}
+
+func GetStarred(u octokit.User) ([]octokit.Repository, error) {
+	url, err := u.StarredURL.Expand(nil)
+	if err != nil {
+		return nil, err
+	}
+
+	starred, result := client.Repositories(url).All()
+	if result.HasError() {
+		return nil, result.Err
+	}
+
+	return starred, nil
 }
 
 func randomString() string {
