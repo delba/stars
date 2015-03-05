@@ -7,22 +7,22 @@ import (
 )
 
 const (
-	ClientID     = "aa78f0f464d4a73010a0"
-	ClientSecret = "842311922d9dd09ee074f63cf0218f9db2c75056"
+	clientID     = "aa78f0f464d4a73010a0"
+	clientSecret = "842311922d9dd09ee074f63cf0218f9db2c75056"
 
-	AuthURL     = "https://github.com/login/oauth/authorize"
-	TokenURL    = "https://github.com/login/oauth/access_token"
-	RedirectURL = "http://localhost:8080/callback"
+	authURL     = "https://github.com/login/oauth/authorize"
+	tokenURL    = "https://github.com/login/oauth/access_token"
+	redirectURL = "http://localhost:8080/callback"
 )
 
 var config = oauth2.Config{
-	ClientID:     ClientID,
-	ClientSecret: ClientSecret,
+	ClientID:     clientID,
+	ClientSecret: clientSecret,
 	Endpoint: oauth2.Endpoint{
-		AuthURL:  AuthURL,
-		TokenURL: TokenURL,
+		AuthURL:  authURL,
+		TokenURL: tokenURL,
 	},
-	RedirectURL: RedirectURL,
+	RedirectURL: redirectURL,
 }
 
 var Client *octokit.Client
