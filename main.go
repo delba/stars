@@ -183,22 +183,13 @@ func GetFollowingStarred() (model.StarredRepositories, error) {
 		go GetStarredRepositories(user, c)
 	}
 
-	result := make(map[string][]string)
-
 	for range following {
 		for user, repos := range <-c {
 			for _, repo := range repos {
-				result[repo.FullName] = append(result[repo.FullName], user.Login)
+				starredRepository := starredRepositories.FindOrCreateByRepository(repo.FullName)
+				starredRepository.Users = append(starredRepository.Users, user.Login)
 			}
 		}
-	}
-
-	for repository, users := range result {
-		starredRepository := &model.StarredRepository{
-			Repository: repository,
-			Users:      users,
-		}
-		starredRepositories = append(starredRepositories, starredRepository)
 	}
 
 	return starredRepositories, err

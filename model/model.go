@@ -7,6 +7,27 @@ type StarredRepository struct {
 
 type StarredRepositories []*StarredRepository
 
+func (sr *StarredRepositories) FindOrCreateByRepository(repo string) *StarredRepository {
+	starredRepository := sr.FindByRepository(repo)
+
+	if starredRepository == nil {
+		starredRepository = &StarredRepository{Repository: repo}
+		*sr = append(*sr, starredRepository)
+	}
+
+	return starredRepository
+}
+
+func (sr *StarredRepositories) FindByRepository(repo string) *StarredRepository {
+	for _, starredRepository := range *sr {
+		if starredRepository.Repository == repo {
+			return starredRepository
+		}
+	}
+
+	return nil
+}
+
 type ByPopularity StarredRepositories
 
 func (c ByPopularity) Len() int {
