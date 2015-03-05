@@ -70,56 +70,45 @@ func PublicIndex(w http.ResponseWriter, r *http.Request) {
 	handle(err)
 }
 
-type ByPopularity []string
-
-func (r ByPopularity) Len() int {
-	return len(r)
+type StarredRepository struct {
+	Repository string
+	Users      []string
 }
 
-func (r ByPopularity) Swap(i, j int) {
-	r[i], r[j] = r[j], r[i]
+type ByPopularity []StarredRepository
+
+func (c ByPopularity) Len() int {
+	return len(c)
 }
 
-func (r ByPopularity) Less(i, j int) bool {
-	return len(followingStarred[r[i]]) > len(followingStarred[r[j]])
+func (c ByPopularity) Swap(i, j int) {
+	c[i], c[j] = c[j], c[i]
 }
 
-var followingStarred map[string][]string
-var keys []string
-
-type Data struct {
-	Keys   []string
-	Result map[string][]string
-}
-
-type Result struct {
-	Repo  string
-	Users []string
-}
-
-func (d *Data) Get(key string) []string {
-	return d.Result[key]
+func (c ByPopularity) Less(i, j int) bool {
+	return len(c[i].Users) > len(c[j].Users)
 }
 
 func PrivateIndex(w http.ResponseWriter, r *http.Request) {
 	var err error
 
-	followingStarred, err = GetFollowingStarred()
-	for key, _ := range followingStarred {
-		keys = append(keys, key)
-	}
-	sort.Sort(ByPopularity(keys))
+	followingStarred, err := GetFollowingStarred()
 
-	var results []Result
+	var starredRepositories []StarredRepository
 
-	for _, key := range keys {
-		results = append(results, Result{Repo: key, Users: followingStarred[key]})
+	for repository, users := range followingStarred {
+		starredRepositories = append(starredRepositories, StarredRepository{
+			Repository: repository,
+			Users:      users,
+		})
 	}
+
+	sort.Sort(ByPopularity(starredRepositories))
 
 	t, err := template.ParseFiles(path.Join("views", "private.html"))
 	handle(err)
 
-	err = t.Execute(w, results)
+	err = t.Execute(w, starredRepositories)
 	handle(err)
 }
 
@@ -220,15 +209,7 @@ func GetFollowingStarred() (map[string][]string, error) {
 	}
 
 	for _, user := range following {
-		go func(u octokit.User, c chan map[octokit.User][]octokit.Repository) {
-			starred, err := GetStarred(u)
-			if err != nil {
-				panic(err)
-			}
-			c <- map[octokit.User][]octokit.Repository{
-				u: starred,
-			}
-		}(user, c)
+		go GetStarredRepositories(user, c)
 	}
 
 	for range following {
@@ -242,18 +223,18 @@ func GetFollowingStarred() (map[string][]string, error) {
 	return result, err
 }
 
-func GetStarred(u octokit.User) ([]octokit.Repository, error) {
+func GetStarredRepositories(u octokit.User, c chan map[octokit.User][]octokit.Repository) {
 	url, err := u.StarredURL.Expand(nil)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
-	starred, result := client.Repositories(url).All()
+	repositories, result := client.Repositories(url).All()
 	if result.HasError() {
-		return nil, result.Err
+		panic(result.Err)
 	}
 
-	return starred, nil
+	c <- map[octokit.User][]octokit.Repository{u: repositories}
 }
 
 func randomString() string {
