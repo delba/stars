@@ -1,6 +1,8 @@
 package github
 
 import (
+	"sort"
+
 	"github.com/delba/stars/model"
 	"github.com/octokit/go-octokit/octokit"
 	"golang.org/x/oauth2"
@@ -116,6 +118,8 @@ func GetFollowingStarred() (model.StarredRepositories, error) {
 			}
 		}
 	}
+
+	sort.Sort(model.ByPopularity(starredRepositories))
 
 	return starredRepositories, err
 }

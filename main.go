@@ -5,11 +5,9 @@ import (
 	"os"
 	"path"
 	"runtime"
-	"sort"
 	"text/template"
 
 	"github.com/delba/stars/github"
-	"github.com/delba/stars/model"
 )
 
 func handle(err error) {
@@ -44,7 +42,6 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		viewFile = viewPath("private.html")
 		data, err = github.GetFollowingStarred()
 		handle(err)
-		sort.Sort(model.ByPopularity(data.(model.StarredRepositories)))
 	}
 
 	t, err := template.ParseFiles(viewFile)
