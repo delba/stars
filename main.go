@@ -168,8 +168,8 @@ func GetFollowing() ([]octokit.User, error) {
 	return following, err
 }
 
-func GetFollowingStarred() ([]model.StarredRepository, error) {
-	var starredRepositories []model.StarredRepository
+func GetFollowingStarred() (model.StarredRepositories, error) {
+	var starredRepositories model.StarredRepositories
 	var err error
 
 	c := make(chan map[octokit.User][]octokit.Repository)
@@ -194,7 +194,7 @@ func GetFollowingStarred() ([]model.StarredRepository, error) {
 	}
 
 	for repository, users := range result {
-		starredRepository := model.StarredRepository{
+		starredRepository := &model.StarredRepository{
 			Repository: repository,
 			Users:      users,
 		}

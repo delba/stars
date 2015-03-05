@@ -5,7 +5,9 @@ type StarredRepository struct {
 	Users      []string
 }
 
-type ByPopularity []StarredRepository
+type StarredRepositories []*StarredRepository
+
+type ByPopularity StarredRepositories
 
 func (c ByPopularity) Len() int {
 	return len(c)
