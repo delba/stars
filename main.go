@@ -74,17 +74,7 @@ func PublicIndex(w http.ResponseWriter, r *http.Request) {
 func PrivateIndex(w http.ResponseWriter, r *http.Request) {
 	var err error
 
-	followingStarred, err := GetFollowingStarred()
-
-	var starredRepositories []model.StarredRepository
-
-	for repository, users := range followingStarred {
-		starredRepositories = append(starredRepositories, model.StarredRepository{
-			Repository: repository,
-			Users:      users,
-		})
-	}
-
+	starredRepositories, err := GetFollowingStarred()
 	sort.Sort(model.ByPopularity(starredRepositories))
 
 	t, err := template.ParseFiles(path.Join("views", "private.html"))
@@ -178,21 +168,22 @@ func GetFollowing() ([]octokit.User, error) {
 	return following, err
 }
 
-func GetFollowingStarred() (map[string][]string, error) {
+func GetFollowingStarred() ([]model.StarredRepository, error) {
+	var starredRepositories []model.StarredRepository
 	var err error
 
 	c := make(chan map[octokit.User][]octokit.Repository)
-	result := make(map[string][]string)
-	// var result map[octokit.Repository][]octokit.User
 
 	following, err := GetFollowing()
 	if err != nil {
-		return result, err
+		return starredRepositories, err
 	}
 
 	for _, user := range following {
 		go GetStarredRepositories(user, c)
 	}
+
+	result := make(map[string][]string)
 
 	for range following {
 		for user, repos := range <-c {
@@ -202,7 +193,15 @@ func GetFollowingStarred() (map[string][]string, error) {
 		}
 	}
 
-	return result, err
+	for repository, users := range result {
+		starredRepository := model.StarredRepository{
+			Repository: repository,
+			Users:      users,
+		}
+		starredRepositories = append(starredRepositories, starredRepository)
+	}
+
+	return starredRepositories, err
 }
 
 func GetStarredRepositories(u octokit.User, c chan map[octokit.User][]octokit.Repository) {
