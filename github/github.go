@@ -1,8 +1,6 @@
 package github
 
 import (
-	"net/http"
-
 	"github.com/delba/stars/model"
 	"github.com/octokit/go-octokit/octokit"
 	"golang.org/x/oauth2"
@@ -34,35 +32,35 @@ func GetAuthURL() string {
 	return config.AuthCodeURL(randomString())
 }
 
-func GetClient(r *http.Request) (*octokit.Client, error) {
-	var client *octokit.Client
+func SetClient(code string) error {
 	var err error
-	code := r.URL.Query()["code"][0]
+
 	token, err := config.Exchange(nil, code)
+
 	if err != nil {
-		return client, err
+		return err
 	}
 
-	client = octokit.NewClient(octokit.TokenAuth{token.AccessToken})
+	Client = octokit.NewClient(octokit.TokenAuth{token.AccessToken})
 
-	return client, err
+	return err
 }
 
-func GetCurrentUser() (*octokit.User, error) {
-	var user *octokit.User
+func SetCurrentUser() error {
 	var err error
 
 	url, err := octokit.CurrentUserURL.Expand(nil)
 	if err != nil {
-		return user, err
+		return err
 	}
 
-	user, result := Client.Users(url).One()
+	var result *octokit.Result
+	CurrentUser, result = Client.Users(url).One()
 	if result.HasError() {
-		return user, err
+		return err
 	}
 
-	return user, err
+	return err
 }
 
 func GetFollowing() ([]octokit.User, error) {

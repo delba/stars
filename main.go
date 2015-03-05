@@ -74,10 +74,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 func Callback(w http.ResponseWriter, r *http.Request) {
 	var err error
 
-	github.Client, err = github.GetClient(r)
+	err = github.SetClient(r.URL.Query()["code"][0])
 	handle(err)
 
-	github.CurrentUser, err = github.GetCurrentUser()
+	err = github.SetCurrentUser()
 	handle(err)
 
 	http.Redirect(w, r, "/", 302)
