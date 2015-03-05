@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"runtime"
 	"sort"
 	"text/template"
 
@@ -63,7 +64,9 @@ func Index(w http.ResponseWriter, r *http.Request) {
 }
 
 func PublicIndex(w http.ResponseWriter, r *http.Request) {
-	t, err := template.ParseFiles(path.Join("views", "public.html"))
+	_, filename, _, _ := runtime.Caller(1)
+
+	t, err := template.ParseFiles(path.Join(path.Dir(filename), "views", "public.html"))
 	handle(err)
 
 	err = t.Execute(w, nil)
@@ -76,7 +79,9 @@ func PrivateIndex(w http.ResponseWriter, r *http.Request) {
 	starredRepositories, err := GetFollowingStarred()
 	sort.Sort(model.ByPopularity(starredRepositories))
 
-	t, err := template.ParseFiles(path.Join("views", "private.html"))
+	_, filename, _, _ := runtime.Caller(1)
+
+	t, err := template.ParseFiles(path.Join(path.Dir(filename), "views", "private.html"))
 	handle(err)
 
 	err = t.Execute(w, starredRepositories)
