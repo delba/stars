@@ -39,5 +39,9 @@ func (c ByPopularity) Swap(i, j int) {
 }
 
 func (c ByPopularity) Less(i, j int) bool {
-	return len(c[i].Users) > len(c[j].Users)
+	if len(c[i].Users) == len(c[j].Users) {
+		return c[i].Repository < c[j].Repository
+	} else {
+		return len(c[i].Users) > len(c[j].Users)
+	}
 }
