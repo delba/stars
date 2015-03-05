@@ -37,7 +37,6 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 	if github.CurrentUser == nil {
 		viewFile = viewPath("public.html")
-		data = nil
 	} else {
 		viewFile = viewPath("private.html")
 		data, err = github.GetFollowingStarred()
