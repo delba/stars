@@ -41,9 +41,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 }
 
 func PublicIndex(w http.ResponseWriter, r *http.Request) {
-	_, filename, _, _ := runtime.Caller(1)
-
-	t, err := template.ParseFiles(path.Join(path.Dir(filename), "views", "public.html"))
+	t, err := template.ParseFiles(viewPath("public.html"))
 	handle(err)
 
 	err = t.Execute(w, nil)
@@ -56,9 +54,7 @@ func PrivateIndex(w http.ResponseWriter, r *http.Request) {
 	starredRepositories, err := github.GetFollowingStarred()
 	sort.Sort(model.ByPopularity(starredRepositories))
 
-	_, filename, _, _ := runtime.Caller(1)
-
-	t, err := template.ParseFiles(path.Join(path.Dir(filename), "views", "private.html"))
+	t, err := template.ParseFiles(viewPath("private.html"))
 	handle(err)
 
 	err = t.Execute(w, starredRepositories)
@@ -86,4 +82,10 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 func Logout(w http.ResponseWriter, r *http.Request) {
 	github.Client, github.CurrentUser = nil, nil
 	http.Redirect(w, r, "/", 302)
+}
+
+func viewPath(file string) string {
+	var _, __FILE__, _, _ = runtime.Caller(1)
+
+	return path.Join(path.Dir(__FILE__), "views", file)
 }
