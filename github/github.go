@@ -35,8 +35,6 @@ func GetAuthURL() string {
 }
 
 func SetClient(code string) error {
-	var err error
-
 	token, err := config.Exchange(nil, code)
 
 	if err != nil {
@@ -49,8 +47,6 @@ func SetClient(code string) error {
 }
 
 func SetCurrentUser() error {
-	var err error
-
 	url, err := octokit.CurrentUserURL.Expand(nil)
 	if err != nil {
 		return err
