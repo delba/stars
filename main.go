@@ -1,4 +1,3 @@
-// TODO Refactor!!!
 package main
 
 import (
