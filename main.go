@@ -186,8 +186,8 @@ func GetFollowingStarred() (model.StarredRepositories, error) {
 	for range following {
 		for user, repos := range <-c {
 			for _, repo := range repos {
-				starredRepository := starredRepositories.FindOrCreateByRepository(repo.FullName)
-				starredRepository.Users = append(starredRepository.Users, user.Login)
+				starredRepository := starredRepositories.FindOrCreateByRepository(repo)
+				starredRepository.Users = append(starredRepository.Users, &user)
 			}
 		}
 	}

@@ -8,7 +8,7 @@
     <p><a href="/logout">Logout</a></p>
     <ul>
       {{range .}}
-      <li><strong>{{.Repository}}</strong>: {{.Users}}</li>
+      <li><strong>{{.Repository.FullName}}</strong>: {{.UserLogins}}</li>
       {{end}}
     </ul>
   </body>
