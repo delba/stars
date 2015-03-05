@@ -33,32 +33,24 @@ func main() {
 }
 
 func Index(w http.ResponseWriter, r *http.Request) {
-	if github.CurrentUser == nil {
-		PublicIndex(w, r)
-	} else {
-		PrivateIndex(w, r)
-	}
-}
-
-func PublicIndex(w http.ResponseWriter, r *http.Request) {
-	t, err := template.ParseFiles(viewPath("public.html"))
-	handle(err)
-
-	err = t.Execute(w, nil)
-	handle(err)
-}
-
-func PrivateIndex(w http.ResponseWriter, r *http.Request) {
+	var viewFile string
+	var data interface{}
 	var err error
 
-	starredRepositories, err := github.GetFollowingStarred()
-	sort.Sort(model.ByPopularity(starredRepositories))
+	if github.CurrentUser == nil {
+		viewFile = viewPath("public.html")
+		data = nil
+	} else {
+		viewFile = viewPath("private.html")
+		data, err = github.GetFollowingStarred()
+		handle(err)
+		sort.Sort(model.ByPopularity(data.(model.StarredRepositories)))
+	}
 
-	t, err := template.ParseFiles(viewPath("private.html"))
+	t, err := template.ParseFiles(viewFile)
 	handle(err)
 
-	err = t.Execute(w, starredRepositories)
-	handle(err)
+	err = t.Execute(w, data)
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
