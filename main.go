@@ -8,6 +8,7 @@ import (
 	"sort"
 	"text/template"
 
+	"github.com/delba/stars/model"
 	"github.com/octokit/go-octokit/octokit"
 	"golang.org/x/oauth2"
 )
@@ -70,40 +71,21 @@ func PublicIndex(w http.ResponseWriter, r *http.Request) {
 	handle(err)
 }
 
-type StarredRepository struct {
-	Repository string
-	Users      []string
-}
-
-type ByPopularity []StarredRepository
-
-func (c ByPopularity) Len() int {
-	return len(c)
-}
-
-func (c ByPopularity) Swap(i, j int) {
-	c[i], c[j] = c[j], c[i]
-}
-
-func (c ByPopularity) Less(i, j int) bool {
-	return len(c[i].Users) > len(c[j].Users)
-}
-
 func PrivateIndex(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	followingStarred, err := GetFollowingStarred()
 
-	var starredRepositories []StarredRepository
+	var starredRepositories []model.StarredRepository
 
 	for repository, users := range followingStarred {
-		starredRepositories = append(starredRepositories, StarredRepository{
+		starredRepositories = append(starredRepositories, model.StarredRepository{
 			Repository: repository,
 			Users:      users,
 		})
 	}
 
-	sort.Sort(ByPopularity(starredRepositories))
+	sort.Sort(model.ByPopularity(starredRepositories))
 
 	t, err := template.ParseFiles(path.Join("views", "private.html"))
 	handle(err)
