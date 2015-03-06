@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -28,6 +29,10 @@ func main() {
 	http.HandleFunc("/login", Login)
 	http.HandleFunc("/logout", Logout)
 	http.HandleFunc("/callback", Callback)
+	http.HandleFunc("/public/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println(r.URL.Path[1:])
+		http.ServeFile(w, r, r.URL.Path[1:])
+	})
 
 	http.ListenAndServe(":"+port, nil)
 }

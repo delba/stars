@@ -2,31 +2,35 @@
 <html>
   <head>
     <title>Stars</title>
-    <style>
-body {
-  width: 580px;
-  margin: 0 auto;
-}
-    </style>
+    <link rel="stylesheet" href="public/css/bootstrap.min.css">
+    <link rel="stylesheet" href="public/css/octicons.css">
+    <link rel="stylesheet" href="public/css/main.css">
   </head>
   <body>
-    <h1>Stars</h1>
-    <p><a href="/logout">Logout</a></p>
-    <section>
+    <header class="header group">
+      <h1>stars</h1>
+      <p><a href="/logout" class="sign-out"><span class="octicon octicon-sign-out"></span></a></p>
+    </header>
+
+    <section class="main">
       {{range .}}
-      <article>
-        <a href="{{.HTMLURL}}">
-          <img src="{{.Owner.AvatarURL}}" alt="{{.Owner.Login}}" height="40"
-          width="40" class="avatar">
-        </a>
+      <article class="group">
+        <div class="avatar">
+          <a href="{{.HTMLURL}}">
+            <img src="{{.Owner.AvatarURL}}" alt="{{.Owner.Login}}" height="40"
+            width="40" class="img-rounded">
+          </a>
+        </div>
 
-        <header>
-          <p><a href="{{.HTMLURL}}"><strong>{{.FullName}}</strong></a></p>
-          <p>{{.Language}}</p>
-        </header>
+        <div class="content">
+          <header>
+            <h4><a href="{{.HTMLURL}}">{{.FullName}}</a></h4>
+            <p class="small"><em>{{.Language}}</em></p>
+          </header>
 
-        <p>{{.Description}}</p>
-        <p><em>{{.FollowingStargazersLogins}}</em></p>
+          <p>{{.Description}}</p>
+          <p class="stargazers"><em>{{.FollowingStargazersLogins}}</em></p>
+        </div>
       </article>
       {{end}}
     </section>
