@@ -1,38 +1,29 @@
-<!DOCTYPE HTML>
-<html>
-  <head>
-    <title>Stars</title>
-    <link rel="stylesheet" href="public/css/bootstrap.min.css">
-    <link rel="stylesheet" href="public/css/octicons.css">
-    <link rel="stylesheet" href="public/css/main.css">
-  </head>
-  <body>
-    <header class="header group">
-      <h1>stars</h1>
-      <p><a href="/logout" class="sign-out"><span class="octicon octicon-sign-out"></span></a></p>
-    </header>
+{{define "main"}}
+<header class="header group">
+  <h1>stars</h1>
+  <p><a href="/logout" class="sign-out"><span class="octicon octicon-sign-out"></span></a></p>
+</header>
 
-    <section class="main">
-      {{range .}}
-      <article class="group">
-        <div class="avatar">
-          <a href="{{.HTMLURL}}">
-            <img src="{{.Owner.AvatarURL}}" alt="{{.Owner.Login}}" height="40"
-            width="40" class="img-rounded">
-          </a>
-        </div>
+<section class="main">
+  {{range .}}
+  <article class="group">
+    <div class="avatar">
+      <a href="{{.HTMLURL}}">
+        <img src="{{.Owner.AvatarURL}}" alt="{{.Owner.Login}}" height="40"
+        width="40" class="img-rounded">
+      </a>
+    </div>
 
-        <div class="content">
-          <header>
-            <h4><a href="{{.HTMLURL}}">{{.FullName}}</a></h4>
-            <p class="small"><em>{{.Language}}</em></p>
-          </header>
+    <div class="content">
+      <header>
+        <h4><a href="{{.HTMLURL}}">{{.FullName}}</a></h4>
+        <p class="small"><em>{{.Language}}</em></p>
+      </header>
 
-          <p>{{.Description}}</p>
-          <p class="stargazers"><em>{{.FollowingStargazersLogins}}</em></p>
-        </div>
-      </article>
-      {{end}}
-    </section>
-  </body>
-</html>
+      <p>{{.Description}}</p>
+      <p class="stargazers"><em>{{.FollowingStargazersLogins}}</em></p>
+    </div>
+  </article>
+  {{end}}
+</section>
+{{end}}

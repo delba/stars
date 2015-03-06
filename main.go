@@ -51,7 +51,9 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		handle(err)
 	}
 
-	t, err := template.ParseFiles(viewFile)
+	layoutFile := viewPath("layout.html")
+
+	t, err := template.ParseFiles(layoutFile, viewFile)
 	handle(err)
 
 	err = t.Execute(w, data)
