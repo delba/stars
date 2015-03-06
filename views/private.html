@@ -2,14 +2,33 @@
 <html>
   <head>
     <title>Stars</title>
+    <style>
+body {
+  width: 580px;
+  margin: 0 auto;
+}
+    </style>
   </head>
   <body>
     <h1>Stars</h1>
     <p><a href="/logout">Logout</a></p>
-    <ul>
+    <section>
       {{range .}}
-      <li><strong>{{.Repository.FullName}}</strong>: {{.UserLogins}}</li>
+      <article>
+        <a href="{{.HTMLURL}}">
+          <img src="{{.Owner.AvatarURL}}" alt="{{.Owner.Login}}" height="40"
+          width="40" class="avatar">
+        </a>
+
+        <header>
+          <p><a href="{{.HTMLURL}}"><strong>{{.FullName}}</strong></a></p>
+          <p>{{.Language}}</p>
+        </header>
+
+        <p>{{.Description}}</p>
+        <p><em>{{.FollowingStargazersLogins}}</em></p>
+      </article>
       {{end}}
-    </ul>
+    </section>
   </body>
 </html>
