@@ -86,7 +86,6 @@ func GetFollowingStarred() (Repositories, error) {
 		for user, repos := range <-c {
 			for _, repo := range repos {
 				rp := repositories.FindOrAddRepository(repo)
-				fmt.Println(user)
 				rp.FollowingStargazers = append(rp.FollowingStargazers, user)
 			}
 		}
