@@ -23,6 +23,14 @@ body {
   float: right;
 }
 
+.sign-in {
+  line-height: 32px;
+}
+
+.sign-in .octicon-mark-github {
+  margin-right: 5px;
+}
+
 .sign-out {
   color: #333;
 }
@@ -64,7 +72,16 @@ body {
 
 .main article .content {
   float: left;
-  width: 488px;
+  width: 426px;
+}
+
+.main article .actions {
+  float: left;
+  width: 62px;
+}
+
+.main article .actions .btn {
+  font-weight: bold;
 }
 
 .main article h4 {

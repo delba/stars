@@ -10,6 +10,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/http"
+	"net/url"
 	"sort"
 )
 
@@ -64,6 +66,7 @@ func GetFollowingStarred() (Repositories, error) {
 
 	following, err := GetFollowing()
 	if err != nil {
+		fmt.Println("Error:", err)
 		return repositories, err
 	}
 
@@ -83,6 +86,7 @@ func GetFollowingStarred() (Repositories, error) {
 		for user, repos := range <-c {
 			for _, repo := range repos {
 				rp := repositories.FindOrAddRepository(repo)
+				fmt.Println(user)
 				rp.FollowingStargazers = append(rp.FollowingStargazers, user)
 			}
 		}
@@ -93,30 +97,93 @@ func GetFollowingStarred() (Repositories, error) {
 	return repositories, err
 }
 
-func isStarringRepository(r Repository) bool {
-	// GET /user/starred/:owner/:repo
-	// 204: true, 404: false
-	return false
+func IsStarringRepository(r *Repository) bool {
+	res, err := Client.Get(baseURL + "/user/starred/" + r.FullName)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	if res.StatusCode == 204 {
+		return true
+	} else {
+		return false
+	}
 }
 
-func StarRepository(r Repository) {
-	// PUT /user/starred/:owner/:repo
+func StarRepository(fullName string) {
+	URL, _ := url.Parse(baseURL + "/user/starred/" + fullName)
+
+	request := &http.Request{
+		Method:        "PUT",
+		URL:           URL,
+		ContentLength: 0,
+	}
+
+	res, err := Client.Do(request)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println(res.StatusCode)
 }
 
-func UnstarRepository(r Repository) {
-	// DELETE /user/starred/:owner/:repo
+func UnstarRepository(fullName string) {
+	URL, _ := url.Parse(baseURL + "/user/starred/" + fullName)
+
+	request := &http.Request{
+		Method: "DELETE",
+		URL:    URL,
+	}
+
+	res, err := Client.Do(request)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println(res.StatusCode)
 }
 
-func isFollowingUser(u User) bool {
-	// GET /user/following/:username
-	// 204: true, 404: false
-	return false
+func IsFollowingUser(u User) bool {
+	res, err := Client.Get(baseURL + "/user/following/" + u.Login)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	if res.StatusCode == 204 {
+		return true
+	} else {
+		return false
+	}
 }
 
-func FollowUser(u User) {
-	// PUT /user/following/:username
+func FollowUser(username string) {
+	URL, _ := url.Parse(baseURL + "/user/following/" + username)
+
+	request := &http.Request{
+		Method: "PUT",
+		URL:    URL,
+	}
+
+	res, err := Client.Do(request)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println(res.StatusCode)
 }
 
-func UnfollowUser(u User) {
-	// DELETE /user/following/:username
+func UnfollowUser(username string) {
+	URL, _ := url.Parse(baseURL + "/user/following/" + username)
+
+	request := &http.Request{
+		Method: "DELETE",
+		URL:    URL,
+	}
+
+	res, err := Client.Do(request)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println(res.StatusCode)
 }

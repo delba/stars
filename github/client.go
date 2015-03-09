@@ -23,6 +23,7 @@ var config = oauth2.Config{
 		TokenURL: tokenURL,
 	},
 	RedirectURL: redirectURL,
+	Scopes:      []string{"public_repo"},
 }
 
 const baseURL = "https://api.github.com"

@@ -23,6 +23,10 @@
       <p>{{.Description}}</p>
       <p class="stargazers"><em>{{.FollowingStargazersLogins}}</em></p>
     </div>
+
+    <div class="actions">
+      <a class="btn btn-default btn-sm" href="/star/{{.FullName}}"><span class="octicon octicon-star"></span> Star</a>
+    </div>
   </article>
   {{end}}
 </section>

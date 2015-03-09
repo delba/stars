@@ -29,6 +29,7 @@ func main() {
 	http.HandleFunc("/login", Login)
 	http.HandleFunc("/logout", Logout)
 	http.HandleFunc("/callback", Callback)
+	http.HandleFunc("/star/", Star)
 	http.HandleFunc("/public/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(r.URL.Path[1:])
 		http.ServeFile(w, r, r.URL.Path[1:])
@@ -46,8 +47,8 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		viewFile = viewPath("public.html")
 	} else {
 		viewFile = viewPath("private.html")
-		// data, err = github.GetFollowingStarred()
-		data, err = fetchFromCache("data.json")
+		data, err = github.GetFollowingStarred()
+		// data, err = fetchFromCache("data.json")
 		handle(err)
 	}
 
@@ -74,6 +75,18 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 
 func Logout(w http.ResponseWriter, r *http.Request) {
 	github.Client = nil
+	http.Redirect(w, r, "/", 302)
+}
+
+func Star(w http.ResponseWriter, r *http.Request) {
+	fullName := r.URL.Path[6:]
+
+	switch r.Method {
+	case "GET":
+		github.StarRepository(fullName)
+	case "DELETE":
+		fmt.Println("Unstar repo")
+	}
 	http.Redirect(w, r, "/", 302)
 }
 

@@ -108,6 +108,7 @@ type Repository struct {
 	Watchers            int    `json:"watchers"`
 	WatchersCount       int    `json:"watchers_count"`
 	FollowingStargazers []User `json:"following_stargazers"`
+	Starred             bool   `json:"starred"`
 }
 
 func (r *Repository) FollowingStargazersLogins() []string {
