@@ -32,17 +32,32 @@ func AuthURL() string {
 	return config.AuthCodeURL(randomString())
 }
 
-func SetClient(code string) error {
+func GetAccessToken(code string) (string, error) {
+	var accessToken string
 	var err error
 
 	token, err := config.Exchange(oauth2.NoContext, code)
 	if err != nil {
-		return err
+		return accessToken, err
+	}
+
+	accessToken = token.AccessToken
+
+	return accessToken, err
+}
+
+func SetClient(r *http.Request) {
+	cookie, err := r.Cookie("access_token")
+	if err != nil {
+		Client = nil
+		return
+	}
+
+	token := &oauth2.Token{
+		AccessToken: cookie.Value,
 	}
 
 	Client = config.Client(oauth2.NoContext, token)
-
-	return err
 }
 
 func randomString() string {

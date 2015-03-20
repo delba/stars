@@ -40,12 +40,14 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	var data interface{}
 	var err error
 
+	github.SetClient(r)
+
 	if github.Client == nil {
 		viewFile = viewPath("public.html")
 	} else {
 		viewFile = viewPath("private.html")
-		data, err = github.GetFollowingStarred()
-		// data, err = fetchFromCache("data.json")
+		// data, err = github.GetFollowingStarred()
+		data, err = fetchFromCache("data.json")
 		handle(err)
 	}
 
@@ -64,14 +66,26 @@ func Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func Callback(w http.ResponseWriter, r *http.Request) {
-	err := github.SetClient(r.URL.Query()["code"][0])
+	code := r.URL.Query()["code"][0]
+	accessToken, err := github.GetAccessToken(code)
 	handle(err)
 
+	cookie := &http.Cookie{
+		Name:  "access_token",
+		Value: accessToken,
+	}
+
+	http.SetCookie(w, cookie)
 	http.Redirect(w, r, "/", 302)
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {
-	github.Client = nil
+	cookie := &http.Cookie{
+		Name:   "access_token",
+		MaxAge: -1,
+	}
+
+	http.SetCookie(w, cookie)
 	http.Redirect(w, r, "/", 302)
 }
 
