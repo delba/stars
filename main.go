@@ -30,10 +30,7 @@ func main() {
 	http.HandleFunc("/logout", Logout)
 	http.HandleFunc("/callback", Callback)
 	http.HandleFunc("/star/", Star)
-	http.HandleFunc("/public/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println(r.URL.Path[1:])
-		http.ServeFile(w, r, r.URL.Path[1:])
-	})
+	http.Handle("/public", http.FileServer(http.Dir("public")))
 
 	http.ListenAndServe(":"+port, nil)
 }
