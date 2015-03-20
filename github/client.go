@@ -26,8 +26,6 @@ var config = oauth2.Config{
 	Scopes:      []string{"public_repo"},
 }
 
-const baseURL = "https://api.github.com"
-
 var Client *http.Client
 
 func AuthURL() string {

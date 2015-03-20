@@ -15,6 +15,8 @@ import (
 	"sort"
 )
 
+const baseURL = "https://api.github.com"
+
 func GetFollowing() ([]User, error) {
 	var users []User
 	var err error
