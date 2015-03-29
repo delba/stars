@@ -19,21 +19,13 @@ func (s *Sessions) Callback(w http.ResponseWriter, r *http.Request) {
 	accessToken, err := github.GetAccessToken(code)
 	handle(err)
 
-	cookie := &http.Cookie{
-		Name:  "access_token",
-		Value: accessToken,
-	}
+	setCookie("access_token", accessToken, w)
 
-	http.SetCookie(w, cookie)
 	http.Redirect(w, r, "/", 302)
 }
 
 func (s *Sessions) Logout(w http.ResponseWriter, r *http.Request) {
-	cookie := &http.Cookie{
-		Name:   "access_token",
-		MaxAge: -1,
-	}
+	deleteCookie("access_token", w)
 
-	http.SetCookie(w, cookie)
 	http.Redirect(w, r, "/", 302)
 }
