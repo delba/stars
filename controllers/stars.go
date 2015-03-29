@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"html/template"
 	"io/ioutil"
 	"net/http"
@@ -26,8 +25,11 @@ func (s *Stars) Index(w http.ResponseWriter, r *http.Request) {
 		viewFile = viewPath("public.html")
 	} else {
 		viewFile = viewPath("private.html")
+		var user models.User
 		// data, err = github.GetFollowingStarred()
-		data, err = fetchFromCache("data.json")
+		// data, err = fetchFromCache("data.json")
+		user.FetchFollowingStarred()
+		data = user.FollowingStarred
 		handle(err)
 	}
 
@@ -40,15 +42,15 @@ func (s *Stars) Index(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Stars) Star(w http.ResponseWriter, r *http.Request) {
-	fullName := r.URL.Path[6:]
+	// fullName := r.URL.Path[6:]
 
-	switch r.Method {
-	case "GET":
-		github.StarRepository(fullName)
-	case "DELETE":
-		fmt.Println("Unstar repo")
-	}
-	http.Redirect(w, r, "/", 302)
+	// switch r.Method {
+	// case "GET":
+	// 	github.StarRepository(fullName)
+	// case "DELETE":
+	// 	fmt.Println("Unstar repo")
+	// }
+	// http.Redirect(w, r, "/", 302)
 }
 
 func viewPath(file string) string {
