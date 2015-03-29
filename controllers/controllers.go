@@ -25,3 +25,13 @@ func deleteCookie(name string, w http.ResponseWriter) {
 
 	http.SetCookie(w, cookie)
 }
+
+func isLoggedIn(r *http.Request) bool {
+	_, err := r.Cookie("access_token")
+
+	if err == nil {
+		return true
+	} else {
+		return false
+	}
+}

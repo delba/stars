@@ -21,16 +21,15 @@ func (s *Stars) Index(w http.ResponseWriter, r *http.Request) {
 
 	github.SetClient(r)
 
-	if github.Client == nil {
-		viewFile = viewPath("public.html")
-	} else {
+	if isLoggedIn(r) {
 		viewFile = viewPath("private.html")
-		var user models.User
-		// data, err = github.GetFollowingStarred()
-		// data, err = fetchFromCache("data.json")
-		user.FetchFollowingStarred()
-		data = user.FollowingStarred
-		handle(err)
+		// var user models.User
+		// err = user.FetchFollowingStarred()
+		// handle(err)
+		// data = user.FollowingStarred
+		data, err = fetchFromCache("data.json")
+	} else {
+		viewFile = viewPath("public.html")
 	}
 
 	layoutFile := viewPath("layout.html")
