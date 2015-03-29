@@ -23,11 +23,11 @@ func (s *Stars) Index(w http.ResponseWriter, r *http.Request) {
 
 	if isLoggedIn(r) {
 		viewFile = viewPath("private.html")
-		// var user models.User
-		// err = user.FetchFollowingStarred()
-		// handle(err)
-		// data = user.FollowingStarred
-		data, err = fetchFromCache("data.json")
+		var user models.User
+		err = user.FetchFollowingStarred()
+		handle(err)
+		data = user.FollowingStarred
+		// data, err = fetchFromCache("data.json")
 	} else {
 		viewFile = viewPath("public.html")
 	}
