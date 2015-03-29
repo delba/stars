@@ -2,27 +2,19 @@ package github
 
 import (
 	"net/http"
+	"os"
 
 	"golang.org/x/oauth2"
 )
 
-const (
-	clientID     = "aa78f0f464d4a73010a0"
-	clientSecret = "842311922d9dd09ee074f63cf0218f9db2c75056"
-
-	authURL     = "https://github.com/login/oauth/authorize"
-	tokenURL    = "https://github.com/login/oauth/access_token"
-	redirectURL = "http://localhost:8080/callback"
-)
-
 var config = oauth2.Config{
-	ClientID:     clientID,
-	ClientSecret: clientSecret,
+	ClientID:     os.Getenv("STARS_CLIENT_ID"),
+	ClientSecret: os.Getenv("STARS_CLIENT_SECRET"),
 	Endpoint: oauth2.Endpoint{
-		AuthURL:  authURL,
-		TokenURL: tokenURL,
+		AuthURL:  "https://github.com/login/oauth/authorize",
+		TokenURL: "https://github.com/login/oauth/access_token",
 	},
-	RedirectURL: redirectURL,
+	RedirectURL: "http://localhost:8080/callback",
 	Scopes:      []string{"public_repo"},
 }
 
