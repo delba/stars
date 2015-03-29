@@ -10,6 +10,7 @@ import (
 	"runtime"
 
 	"github.com/delba/stars/github"
+	"github.com/delba/stars/models"
 )
 
 type Stars struct{}
@@ -64,9 +65,9 @@ func cacheToFile(data []byte, file string) error {
 	return err
 }
 
-func fetchFromCache(file string) (github.Repositories, error) {
+func fetchFromCache(file string) (models.Repositories, error) {
 	var err error
-	repositories := github.Repositories{}
+	repositories := models.Repositories{}
 
 	contents, err := ioutil.ReadFile(file)
 	if err != nil {

@@ -1,4 +1,4 @@
-package github
+package models
 
 type User struct {
 	AvatarURL         string      `json:"avatar_url"`

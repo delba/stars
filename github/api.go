@@ -13,12 +13,14 @@ import (
 	"net/http"
 	"net/url"
 	"sort"
+
+	"github.com/delba/stars/models"
 )
 
 const baseURL = "https://api.github.com"
 
-func GetFollowing() ([]User, error) {
-	var users []User
+func GetFollowing() ([]models.User, error) {
+	var users []models.User
 	var err error
 
 	res, err := Client.Get(baseURL + "/user/following")
@@ -40,8 +42,8 @@ func GetFollowing() ([]User, error) {
 	return users, err
 }
 
-func GetStarredForUser(u User) ([]Repository, error) {
-	var repositories []Repository
+func GetStarredForUser(u models.User) ([]models.Repository, error) {
+	var repositories []models.Repository
 	var err error
 
 	res, err := Client.Get(baseURL + "/users/" + u.Login + "/starred")
@@ -63,8 +65,8 @@ func GetStarredForUser(u User) ([]Repository, error) {
 	return repositories, err
 }
 
-func GetFollowingStarred() (Repositories, error) {
-	var repositories Repositories
+func GetFollowingStarred() (models.Repositories, error) {
+	var repositories models.Repositories
 
 	following, err := GetFollowing()
 	if err != nil {
@@ -72,15 +74,15 @@ func GetFollowingStarred() (Repositories, error) {
 		return repositories, err
 	}
 
-	c := make(chan map[User][]Repository)
+	c := make(chan map[models.User][]models.Repository)
 
 	for _, user := range following {
-		go func(u User, c chan map[User][]Repository) {
+		go func(u models.User, c chan map[models.User][]models.Repository) {
 			repositories, err := GetStarredForUser(u)
 			if err != nil {
 				fmt.Println(err)
 			}
-			c <- map[User][]Repository{u: repositories}
+			c <- map[models.User][]models.Repository{u: repositories}
 		}(user, c)
 	}
 
@@ -93,12 +95,12 @@ func GetFollowingStarred() (Repositories, error) {
 		}
 	}
 
-	sort.Sort(ByPopularity(repositories))
+	sort.Sort(models.ByPopularity(repositories))
 
 	return repositories, err
 }
 
-func IsStarringRepository(r *Repository) bool {
+func IsStarringRepository(r *models.Repository) bool {
 	res, err := Client.Get(baseURL + "/user/starred/" + r.FullName)
 	if err != nil {
 		fmt.Println(err)
@@ -144,7 +146,7 @@ func UnstarRepository(fullName string) {
 	fmt.Println(res.StatusCode)
 }
 
-func IsFollowingUser(u User) bool {
+func IsFollowingUser(u models.User) bool {
 	res, err := Client.Get(baseURL + "/user/following/" + u.Login)
 	if err != nil {
 		fmt.Println(err)
