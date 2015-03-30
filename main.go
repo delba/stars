@@ -15,8 +15,9 @@ func handle(err error) {
 }
 
 var (
-	stars    controllers.Stars
-	sessions controllers.Sessions
+	stars       controllers.Stars
+	sessions    controllers.Sessions
+	middlewares controllers.Middlewares
 )
 
 func main() {
@@ -27,8 +28,8 @@ func main() {
 
 	router := httprouter.New()
 	router.GET("/", stars.Index)
-	router.PUT("/star/:owner/:repo", stars.Star)
-	router.DELETE("/star/:owner/:repo", stars.Unstar)
+	router.PUT("/star/:owner/:repo", middlewares.Authenticate(stars.Star))
+	router.DELETE("/star/:owner/:repo", middlewares.Authenticate(stars.Unstar))
 	router.GET("/login", sessions.New)
 	router.GET("/callback", sessions.Create)
 	router.DELETE("/logout", sessions.Destroy)
