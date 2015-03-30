@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path"
-	"runtime"
 
 	"github.com/delba/stars/github"
 	"github.com/delba/stars/models"
@@ -58,9 +57,7 @@ func (s *Stars) Unstar(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 }
 
 func viewPath(file string) string {
-	var _, __FILE__, _, _ = runtime.Caller(1)
-
-	return path.Join(path.Dir(__FILE__), "..", "views", file)
+	return path.Join("views", file)
 }
 
 func cacheToFile(data []byte, file string) error {
