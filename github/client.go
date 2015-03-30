@@ -14,7 +14,7 @@ var config = oauth2.Config{
 		AuthURL:  "https://github.com/login/oauth/authorize",
 		TokenURL: "https://github.com/login/oauth/access_token",
 	},
-	RedirectURL: "http://localhost:8080/callback",
+	RedirectURL: os.Getenv("STARS_REDIRECT_URL"),
 	Scopes:      []string{"public_repo"},
 }
 
