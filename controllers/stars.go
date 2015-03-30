@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"io/ioutil"
 	"net/http"
@@ -10,11 +11,12 @@ import (
 
 	"github.com/delba/stars/github"
 	"github.com/delba/stars/models"
+	"github.com/julienschmidt/httprouter"
 )
 
 type Stars struct{}
 
-func (s *Stars) Index(w http.ResponseWriter, r *http.Request) {
+func (s *Stars) Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var viewFile string
 	var data interface{}
 	var err error
@@ -40,16 +42,16 @@ func (s *Stars) Index(w http.ResponseWriter, r *http.Request) {
 	err = t.Execute(w, data)
 }
 
-func (s *Stars) Star(w http.ResponseWriter, r *http.Request) {
-	// fullName := r.URL.Path[6:]
+func (s *Stars) Star(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	owner := ps.ByName("owner")
+	repo := ps.ByName("repo")
+	fmt.Println(owner, repo)
+}
 
-	// switch r.Method {
-	// case "GET":
-	// 	github.StarRepository(fullName)
-	// case "DELETE":
-	// 	fmt.Println("Unstar repo")
-	// }
-	// http.Redirect(w, r, "/", 302)
+func (s *Stars) Unstar(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	owner := ps.ByName("owner")
+	repo := ps.ByName("repo")
+	fmt.Println(owner, repo)
 }
 
 func viewPath(file string) string {

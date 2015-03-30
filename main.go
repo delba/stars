@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/delba/stars/controllers"
+	"github.com/julienschmidt/httprouter"
 )
 
 func handle(err error) {
@@ -13,30 +14,28 @@ func handle(err error) {
 	}
 }
 
+var (
+	stars    controllers.Stars
+	sessions controllers.Sessions
+)
+
 func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 
-	var sessions controllers.Sessions
-	var stars controllers.Stars
-
-	routes := map[string]func(http.ResponseWriter, *http.Request){
-		"/":         stars.Index,
-		"/star/":    stars.Star,
-		"/login":    sessions.Login,
-		"/logout":   sessions.Logout,
-		"/callback": sessions.Callback,
-	}
-
-	for path, handler := range routes {
-		http.HandleFunc(path, handler)
-	}
+	router := httprouter.New()
+	router.GET("/", stars.Index)
+	router.PUT("/star/:owner/:repo", stars.Star)
+	router.DELETE("/star/:owner/:repo", stars.Unstar)
+	router.GET("/login", sessions.New)
+	router.GET("/callback", sessions.Create)
+	router.DELETE("/logout", sessions.Destroy)
 
 	fs := http.FileServer(http.Dir("public"))
-	http.Handle("/public/", http.StripPrefix("/public/", fs))
-	http.Handle("/favico.ico", fs)
+	router.Handler("GET", "/public/*filepath", http.StripPrefix("/public/", fs))
+	router.Handler("GET", "/favico.ico", fs)
 
-	http.ListenAndServe(":"+port, nil)
+	http.ListenAndServe(":"+port, router)
 }
