@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"html/template"
 	"io/ioutil"
 	"net/http"
@@ -45,13 +44,17 @@ func (s *Stars) Index(w http.ResponseWriter, r *http.Request, _ httprouter.Param
 func (s *Stars) Star(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	owner := ps.ByName("owner")
 	repo := ps.ByName("repo")
-	fmt.Println(owner, repo)
+
+	data := map[string]string{"owner": owner, "repo": repo}
+	json.NewEncoder(w).Encode(data)
 }
 
 func (s *Stars) Unstar(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	owner := ps.ByName("owner")
 	repo := ps.ByName("repo")
-	fmt.Println(owner, repo)
+
+	data := map[string]string{"owner": owner, "repo": repo}
+	json.NewEncoder(w).Encode(data)
 }
 
 func viewPath(file string) string {
