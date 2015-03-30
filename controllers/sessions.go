@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/delba/stars/github"
@@ -28,5 +29,6 @@ func (s *Sessions) Create(w http.ResponseWriter, r *http.Request, _ httprouter.P
 func (s *Sessions) Destroy(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	deleteCookie("access_token", w)
 
-	http.Redirect(w, r, "/", 302)
+	data := map[string]string{"location": "/"}
+	json.NewEncoder(w).Encode(data)
 }
